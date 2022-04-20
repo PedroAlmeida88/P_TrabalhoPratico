@@ -6,11 +6,12 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-
+char*** criaTabuleiro(int tabs,int nLin, int nCol);
+void libertaTabuleiro(char ***mat,int tabs,int nLin);
 // Liberta uma matriz dinâmica de caracteres com nLin linhas
 void libertaMat(char** p, int nLin);
 
-// Cria uma matriz dinâmica de caracteres  com nLin linhas e nCol colunas
+
 // Devolve endereço inicial da matriz
 char** criaMat(int nLin, int nCol);
 
@@ -20,7 +21,7 @@ void setPos(char **p[], int x, int y,int z, char c);
 // Obtém o caracter armazenado na posição (y, z) de um mini-tabuleiro x
 char getPos(char **p[],int x, int y,int z);
 
-//cria os 9 mini-tabuleiros(de forma não dinamica)
+//cria os 9 mini-tabuleiros
 void cria_tabuleiros(char **mat[]);
 
 //mostra o tabuleiro completo

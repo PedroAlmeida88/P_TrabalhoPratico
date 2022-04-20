@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include "jogo.h"
 #include "matdin.h"
+#include "utils.h"
 
 
 //converte uma posicao(1-9) para as coordenadas no array
@@ -60,7 +61,6 @@ void comeca_jogo(char **mat[],int jogador){
     mostraTabuleiro(mat);
 
     do{
-        res = 1;
         printf("Em qual mini-tabuleiro deseja comecar?(1-9):");
         res = scanf("%d",&mini_tab);
         fflush(stdin);//limpa o buffer |sem isso fica em ciclo infinito
@@ -101,14 +101,96 @@ void comeca_jogo(char **mat[],int jogador){
                     printf("\nJogador %d,em qual tabuleiro deseja jogar?", jogador);
                     res = scanf("%d", &mini_tab);
                     fflush(stdin);
-                    converte_posicao(mini_tab, &x, &y);
-                } while (vencedores[x][y] != '_' || res == 0);//para n voltar para um tab já ganho
+                    resul = converte_posicao(mini_tab, &x, &y);
+                } while (vencedores[x][y] != '_' || res == 0 ||resul == 1);//para n voltar para um tab já ganho
             }
             printf("\nJogador %d, esta a jogar no tabuleiro %d\n", jogador, mini_tab);
             //verificar se algum jogador ganhou o jogo
         }
     } while (ganhou != 1);
+    libertaMat(vencedores,3);
+    libertaTabuleiro(mat,9,3);
 }
+//jogo contra o computador
+void comeca_jogo_bot(char **mat[]){
+    int jogador = 1,mini_tab,pos=0,x,y,resul,ganhou,res=1;
+    char **vencedores;
+    vencedores = criaMat(3,3);//armazena o vencedor de cada mini-tab
+    //recebe mat e o jogador a jogar
+    mostraTabuleiro(mat);
+
+    do{
+        printf("Em qual mini-tabuleiro deseja comecar?(1-9):");
+        res = scanf("%d",&mini_tab);
+        fflush(stdin);//limpa o buffer |sem isso fica em ciclo infinito
+    }while(mini_tab < 1 || mini_tab > 9 || res == 0);
+
+    printf("\nJogador %d, esta a jogar no tabuleiro %d\n",jogador,mini_tab);
+
+    do {
+        do{
+            if(jogador == 1) {
+                printf("Em que posicao deseja jogar:");
+                res = scanf("%d", &pos);
+                fflush(stdin);
+                resul = converte_posicao(pos, &x, &y);//converter para as coordenadas no array
+            }else{
+                pos = intUniformRnd(1,9);
+                resul = converte_posicao(pos, &x, &y);//converter para as coordenadas no array
+            }
+        }while(mat[mini_tab-1][x][y] != '_' || resul == 1 || res == 0);
+
+        if(jogador == 1)
+            setPos(mat, mini_tab - 1, x, y, 'X');
+        else
+            setPos(mat, mini_tab - 1, x, y, 'O');
+
+        //verificar se alguem ganhou um mini-tab
+        if(jogador == 2) {
+            ganha_mini_tabuleiro(mat, mini_tab, 3, 4, vencedores);//jogador 4 == bot
+        }else{
+            ganha_mini_tabuleiro(mat, mini_tab, 3, jogador, vencedores);
+        }
+
+        //atualizar para o novo mini-tabuleiro
+        mini_tab = pos;
+
+        printf("\n");//para os mini-tabuleiros não desformatarem
+        mostraTabuleiro(mat);
+        printf("\n\n");
+        if(jogador == 2) {
+            ganhou = ganha_quadro_final(vencedores, 4);// 4->bot
+        }else{
+            ganhou = ganha_quadro_final(vencedores, jogador);
+        }
+        if(ganhou != 1) {
+            //troca o jogador
+            jogador = jogador % 2 + 1;
+
+            //caso o mini tab esteja encerrado
+            if (vencedores[x][y] != '_') {
+                printf("\nTabuleiro %d fechado!", mini_tab);
+                do {
+                    if(jogador == 1) {
+                        printf("\nJogador %d,em qual tabuleiro deseja jogar?", jogador);
+                        res = scanf("%d", &mini_tab);
+                        fflush(stdin);
+                        resul = converte_posicao(mini_tab, &x, &y);
+                    }else{
+                        mini_tab = intUniformRnd(1,9);
+                        resul = converte_posicao(mini_tab, &x, &y);
+                    }
+                } while (vencedores[x][y] != '_' || res == 0 || resul == 1);//para n voltar para um tab já ganho
+            }
+            if(jogador == 1)
+                printf("\nJogador %d, esta a jogar no tabuleiro %d\n", jogador, mini_tab);
+            //verificar se algum jogador ganhou o jogo
+        }
+    } while (ganhou != 1);
+    libertaMat(vencedores,3);
+    libertaTabuleiro(mat,9,3);
+}
+
 //verifica se foi completada uma linha
 int linha(char **mat[],int min_tab,int lin){
     int i,j;
@@ -171,8 +253,13 @@ int ganha_mini_tabuleiro(char **mat[],int mini_tab,int lin,int jogador, char **v
     int DiagDois = diagonalDois(mat,mini_tab,lin);
     int emp;
     if(Linha == 1 || Coluna == 1 || DiagUm == 1 || DiagDois == 1){
-        printf("O jogador %d ganhou o tabuleiro %d",jogador,mini_tab);
-        encerra_mini_tabuleiro(mat,mini_tab,jogador,vencedores);
+        if(jogador == 4) {
+            printf("O computador ganhou o tabuleiro %d", mini_tab);
+            encerra_mini_tabuleiro(mat, mini_tab, 2, vencedores);
+        }else{
+            printf("O jogador %d ganhou o tabuleiro %d", jogador, mini_tab);
+            encerra_mini_tabuleiro(mat, mini_tab, jogador, vencedores);
+        }
     }
     else{//verificar se houve um empate
         emp = empate(mat,mini_tab,lin);
@@ -210,7 +297,7 @@ int linha_final(char **vencedores,char lin){
     int i, j;
 
     for(i=0; i<lin; i++)
-        if(vencedores[i][0] != '_'){
+        if(vencedores[i][0] != '_' && vencedores[i][0] != 'E'){
             for(j=0; j<lin-1 && vencedores[i][j] == vencedores[i][j+1]; j++)
                 ;
             if(j==lin-1)
@@ -222,7 +309,7 @@ int linha_final(char **vencedores,char lin){
 int coluna_final(char **vencedores,char col){
     int i=0,j=0;
     for(i=0; i<col; i++)
-        if(vencedores[0][i] != '_'){
+        if(vencedores[0][i] != '_' && vencedores[0][i] != 'E'){
             for(j=0; j<col-1 && vencedores[j][i] == vencedores[j+1][i]; j++)
                 ;
             if(j==col-1) {
@@ -234,7 +321,7 @@ int coluna_final(char **vencedores,char col){
 //verifica se foi completada uma diagonal no quadro final
 int diagonal1_final(char **vencedores,char col){
     int j,i;
-    if(vencedores[0][0] != '_'){
+    if(vencedores[0][0] != '_' && vencedores[0][0] != 'E') {
         for(i=0,j=0; i<col-1; i++,j++){
             if(vencedores[i][j] != vencedores[i+1][j+1])
                 return 0;
@@ -244,7 +331,7 @@ int diagonal1_final(char **vencedores,char col){
 }
 //verifica se foi completada uma diagonal no quadro final
 int diagonal2_final(char **vencedores){
-    if (vencedores[0][2] != '_'){
+    if (vencedores[0][2] != '_' && vencedores[0][2] != 'E'){
         if (vencedores[0][2] == vencedores[1][1] && vencedores[1][1] == vencedores[2][0] ) {
             return 1;
         }
@@ -269,8 +356,13 @@ int ganha_quadro_final(char **vencedores,int jogador){
     int DiagDois = diagonal2_final(vencedores);
     int emp;
     if(Linha == 1 || Coluna == 1 || DiagUm == 1 || DiagDois == 1){
-        printf("O jogador %d ganhou o jogo!!",jogador);
-        return 1;
+        if(jogador == 4) {
+            printf("O computador ganhou o jogo!!");
+            return 1;
+        }else{
+            printf("O jogador %d ganhou o jogo!!", jogador);
+            return 1;
+        }
     }
     else{//verificar se houve um empate
         emp = empate_final(vencedores,3);

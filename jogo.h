@@ -7,6 +7,8 @@
 
 //recebe a matriz e o jogador a começar
 void comeca_jogo(char **mat[],int jogador);
+//jogo contra o computador
+void comeca_jogo_bot(char **mat[]);
 //converte uma posicao(1-9) para as coordenadas no array
 int converte_posicao(int pos,int *x,int *y);
 //verifica se foi completada uma linha

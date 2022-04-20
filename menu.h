@@ -6,5 +6,6 @@
 #define TP_MENU_H
 
 int menu();
+int menu_jogo();
 
 #endif //TP_MENU_H

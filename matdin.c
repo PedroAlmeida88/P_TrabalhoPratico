@@ -1,7 +1,53 @@
 #include "stdio.h"
 #include "stdlib.h"
 
+char*** criaTabuleiro(int tabs,int nLin,int nCol){
+    char*** mat = (char***)malloc(tabs * sizeof(char**));
 
+    if (mat == NULL)
+    {
+        fprintf(stderr, "Out of memory");
+        exit(0);
+    }
+    for (int i = 0; i < tabs; i++)
+    {
+        mat[i] = (char**)malloc(nLin * sizeof(char*));
+        if (mat[i] == NULL)
+        {
+            fprintf(stderr, "Out of memory");
+            exit(0);
+        }
+        for (int j = 0; j < nLin; j++)
+        {
+            mat[i][j] = (char*)malloc(nCol * sizeof(char));
+            if (mat[i][j] == NULL)
+            {
+                fprintf(stderr, "Out of memory");
+                exit(0);
+            }
+        }
+    }
+    for (int i = 0; i < tabs; i++)
+    {
+        for (int j = 0; j < nLin; j++)
+        {
+            for (int k = 0; k < nCol; k++) {
+                mat[i][j][k] = '_';
+            }
+        }
+    }
+    return mat;
+}
+void libertaTabuleiro(char ***mat,int tabs,int nLin){
+    for (int i = 0; i < tabs; i++)
+    {
+        for (int j = 0; j < nLin; j++) {
+            free(mat[i][j]);
+        }
+        free(mat[i]);
+    }
+    free(mat);
+}
 void libertaMat(char** p, int nLin){
 
     int i;
@@ -106,7 +152,6 @@ void cria_tabuleiros(char **mat[]){
         mat[i] = criaMat(3,3);
     }
 }
-//mostra uma matriz
 void mostraMat(char **p, int nLin, int nCol){
     int i,j;
 
