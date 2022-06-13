@@ -1,13 +1,16 @@
-//
-// Created by pedro on 11/04/2022.
-//
+// Trabalho Pratico Programacao - LEI
+// DEIS-ISEC 2021-2022
+// José Pedro Sousa Almeida-a2020141980
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include "jogo.h"
 #include "matdin.h"
 #include "utils.h"
-
-
+#include "listas.h"
+#include "ficheiros.h"
+#include "menu.h"
+#include <errno.h>
 //converte uma posicao(1-9) para as coordenadas no array
 int converte_posicao(int pos,int *x,int *y){
     switch (pos) {
@@ -52,23 +55,63 @@ int converte_posicao(int pos,int *x,int *y){
     }
     return 0;
 }
-//recebe a matriz e o jogador a começar
-void comeca_jogo(char **mat[],int jogador){
-    int mini_tab,pos=0,x,y,resul,ganhou,res=1;
-    char **vencedores;
+//recebe o jogador a começar e uma flag que indica se existe um jogo anterior
+void comeca_jogo(int jogador,int flag_fich) {
+    int mini_tab, pos = 0, x, y, resul, ganhou, res = 1, n_jogada = 1, n, opt, flag = 0; //n->num de jogadas para ver
+    char aux;
+    pJogada lista = NULL;//lista ligada que vai guardar as jogadas
+    char ***mat, **vencedores;
     vencedores = criaMat(3,3);//armazena o vencedor de cada mini-tab
+
+    if (flag_fich == 1) { //continua jogo anterior
+        printf("\nA continuar o jogo anterior\n");
+        mat = reconstroi_tabuleiro("jogo.bin",vencedores);
+        flag = 1;//para não perguntar em qual tab quer começar
+        ultima_jogada("jogo.bin", &mini_tab, &jogador, &n_jogada);//mini-tab e jogador da ultima jogada
+        jogador = jogador % 2 + 1;
+        //recontruir lista ligada
+        lista = reconstroi_lista("jogo.bin", lista);
+    } else if(flag_fich == 2){//caso haja um ficheiro e não seja pretendido continuar o jogo
+        if (remove("jogo.bin") == -1) {
+            printf("Erro a remover o ficheiro");
+        }
+        mat = criaTabuleiro(9, 3, 3);
+    }else//caso não exista um ficheiro
+        mat = criaTabuleiro(9, 3, 3);
+
+
     //recebe mat e o jogador a jogar
     mostraTabuleiro(mat);
 
-    do{
-        printf("Em qual mini-tabuleiro deseja comecar?(1-9):");
-        res = scanf("%d",&mini_tab);
-        fflush(stdin);//limpa o buffer |sem isso fica em ciclo infinito
-    }while(mini_tab < 1 || mini_tab > 9 || res == 0);
-
+    if(flag == 0) {
+        do {
+            printf("Em qual mini-tabuleiro deseja comecar?(1-9):");
+            res = scanf("%d", &mini_tab);
+            fflush(stdin);
+        } while (mini_tab < 1 || mini_tab > 9 || res == 0);
+    }
     printf("\nJogador %d, esta a jogar no tabuleiro %d\n",jogador,mini_tab);
 
     do {
+        int jogada = menu_jogada();
+        //Ver jogadas anteriores
+        if(jogada == 2) {
+            if (n_jogada != 1) {//para nao perguntar quando ainda não foram efetuadas jogadas
+                    do {
+                        printf("Quantas jogadas deseja ver? (maximo 10):");
+                        scanf("%d", &n);
+                        fflush(stdin);
+                    } while (n < 1 || n > 10);
+                    mostra_n_jogadas_anteriores(lista, n, n_jogada);
+            }
+        }
+        if(jogada == 3){
+            //Para o jogo;
+            guarda_lista_bin(lista,n_jogada-1,0);
+            liberta_lista(lista);
+            return;
+        }
+        //Fazer uma jogadas
         do{
             printf("Em que posicao deseja jogar:");
             res = scanf("%d", &pos);
@@ -80,6 +123,10 @@ void comeca_jogo(char **mat[],int jogador){
             setPos(mat, mini_tab - 1, x, y, 'X');
         else
             setPos(mat, mini_tab - 1, x, y, 'O');
+
+        //guarda a jogada na lista
+        lista = insere_final(lista,n_jogada,mini_tab,pos,jogador);
+        //mostra_lista(lista);
 
         //verificar se alguem ganhou um mini-tab
         ganha_mini_tabuleiro(mat,mini_tab,3,jogador,vencedores);
@@ -107,27 +154,80 @@ void comeca_jogo(char **mat[],int jogador){
             printf("\nJogador %d, esta a jogar no tabuleiro %d\n", jogador, mini_tab);
             //verificar se algum jogador ganhou o jogo
         }
+        n_jogada++;
+
     } while (ganhou != 1);
+    //guardar num fich de texto
+    if(escolhe() == 1){
+        guarda_lista_txt(lista);
+    }
+    if(flag_fich == 1) //se existir um ficheiro
+        if(remove("jogo.bin"))
+            printf("Erro a remover o ficheiro");
+    liberta_lista(lista);
     libertaMat(vencedores,3);
     libertaTabuleiro(mat,9,3);
 }
 //jogo contra o computador
-void comeca_jogo_bot(char **mat[]){
-    int jogador = 1,mini_tab,pos=0,x,y,resul,ganhou,res=1;
-    char **vencedores;
-    vencedores = criaMat(3,3);//armazena o vencedor de cada mini-tab
+void comeca_jogo_bot(int flag_fich) {
+    int jogador = 1, mini_tab, pos = 0, x, y,n, resul, ganhou, res = 1, flag = 0, n_jogada = 1;
+    char ***mat, **vencedores;
+    pJogada lista = NULL;//lista ligada que vai guardar as jogadas
+    vencedores = criaMat(3, 3);//armazena o vencedor de cada mini-tab
+    if (flag_fich == 1) { //continua jogo anterior
+        printf("\nA continuar o jogo anterior\n");
+        mat = reconstroi_tabuleiro("jogo.bin",vencedores);
+        //verificar se alguem ganhou algum mini-tabuleiro
+        flag = 1;//para não perguntar em qual tab quer começar
+        ultima_jogada("jogo.bin", &mini_tab, &jogador, &n_jogada);//mini-tab e jogador da ultima jogada
+        jogador = jogador % 2 + 1;
+        //recontruir lista ligada
+        lista = reconstroi_lista("jogo.bin", lista);
+    } else if(flag_fich == 2){//caso haja um ficheiro e não seja pretendido continuar o jogo
+        if (remove("jogo.bin") == -1) {
+            printf("Erro a apagar o ficheiro\n");
+        }
+        mat = criaTabuleiro(9, 3, 3);
+    }else//caso não exista um ficheiro
+        mat = criaTabuleiro(9, 3, 3);
+
+
+
     //recebe mat e o jogador a jogar
     mostraTabuleiro(mat);
 
-    do{
-        printf("Em qual mini-tabuleiro deseja comecar?(1-9):");
-        res = scanf("%d",&mini_tab);
-        fflush(stdin);//limpa o buffer |sem isso fica em ciclo infinito
-    }while(mini_tab < 1 || mini_tab > 9 || res == 0);
-
+    if (flag == 0) {
+        do {
+            printf("Em qual mini-tabuleiro deseja comecar?(1-9):");
+            res = scanf("%d", &mini_tab);
+            fflush(stdin);//limpa o buffer |sem isso fica em ciclo infinito
+        } while (mini_tab < 1 || mini_tab > 9 || res == 0);
+    }
     printf("\nJogador %d, esta a jogar no tabuleiro %d\n",jogador,mini_tab);
 
     do {
+        if(jogador == 1) {
+            //mostra_lista(lista);
+            int jogada = menu_jogada();
+            //Ver jogadas anteriores
+            if (jogada == 2) {
+                if (n_jogada != 1) {//para n perguntar quando ainda não foram efetuadas jogadas
+                    do {
+                        printf("Quantas jogadas deseja ver? (maximo 10):");
+                        scanf("%d", &n);
+                        fflush(stdin);
+                    } while (n < 1 || n > 10);
+                    mostra_n_jogadas_anteriores(lista, n, n_jogada);
+                }
+            }
+            if (jogada == 3) {
+                //Para o jogo;
+                guarda_lista_bin(lista, n_jogada - 1, 1);
+                liberta_lista(lista);
+                return;
+            }
+        }
+        //Fazer uma jogadas
         do{
             if(jogador == 1) {
                 printf("Em que posicao deseja jogar:");
@@ -144,6 +244,9 @@ void comeca_jogo_bot(char **mat[]){
             setPos(mat, mini_tab - 1, x, y, 'X');
         else
             setPos(mat, mini_tab - 1, x, y, 'O');
+
+        //guarda a jogada na lista
+        lista = insere_final(lista,n_jogada,mini_tab,pos,jogador);
 
         //verificar se alguem ganhou um mini-tab
         if(jogador == 2) {
@@ -186,7 +289,16 @@ void comeca_jogo_bot(char **mat[]){
                 printf("\nJogador %d, esta a jogar no tabuleiro %d\n", jogador, mini_tab);
             //verificar se algum jogador ganhou o jogo
         }
+        n_jogada++;
     } while (ganhou != 1);
+    //guardar num fich de texto
+    if(escolhe() == 1){
+        guarda_lista_txt(lista);
+    }
+    if(flag_fich == 1) //se existir um ficheiro
+        if(remove("jogo.bin"))
+            printf("Erro a remover o ficheiro");
+    liberta_lista(lista);
     libertaMat(vencedores,3);
     libertaTabuleiro(mat,9,3);
 }
@@ -206,7 +318,7 @@ int linha(char **mat[],int min_tab,int lin){
 }
 //verifica se foi completada uma coluna
 int coluna(char **mat[],int min_tab,int col){
-    int i=0,j=0;
+    int i,j;
     for(i=0; i<col; i++)
         if(mat[min_tab-1][0][i] != '_'){
             for(j=0; j<col-1 && mat[min_tab-1][j][i] == mat[min_tab-1][j+1][i]; j++)

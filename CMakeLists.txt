@@ -3,4 +3,4 @@ project (TP C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(TP main.c matdin.c matdin.h utils.c utils.h jogo.c jogo.h menu.c menu.h)
+add_executable(TP main.c matdin.c matdin.h utils.c utils.h jogo.c jogo.h menu.c menu.h listas.c listas.h ficheiros.c ficheiros.h)

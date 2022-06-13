@@ -1,3 +1,6 @@
+// Trabalho Pratico Programacao - LEI
+// DEIS-ISEC 2021-2022
+// José Pedro Sousa Almeida-a2020141980
 #include "stdio.h"
 #include "stdlib.h"
 
@@ -6,24 +9,24 @@ char*** criaTabuleiro(int tabs,int nLin,int nCol){
 
     if (mat == NULL)
     {
-        fprintf(stderr, "Out of memory");
-        exit(0);
+        printf("Erro ao alocar memoria");
+        return NULL;
     }
     for (int i = 0; i < tabs; i++)
     {
         mat[i] = (char**)malloc(nLin * sizeof(char*));
         if (mat[i] == NULL)
         {
-            fprintf(stderr, "Out of memory");
-            exit(0);
+            printf("Erro ao alocar memoria");
+            return NULL;
         }
         for (int j = 0; j < nLin; j++)
         {
             mat[i][j] = (char*)malloc(nCol * sizeof(char));
             if (mat[i][j] == NULL)
             {
-                fprintf(stderr, "Out of memory");
-                exit(0);
+                printf("Erro ao alocar memoria");
+                return NULL;
             }
         }
     }
@@ -88,24 +91,25 @@ char getPos(char **p[],int x, int y,int z){
 void mostraTabuleiro(char **mat[]){
     int k,j,i,x=0;
     //printa as 3 primeiras linhas
+    printf("\n");
     for(int l=0;l<3;l++) {//linha
         for (j = 0; j < 1; j++) {//indice das linhas ->aumenta depois de printada uma linha
             for (k = 0; k < 3; k++) {//num do quadro
                 if(x==3)
                     x=0;
                 for (i = 0; i < 3; i++) {
-                    printf("%c\t", mat[k][j+x][i]);
+                    printf("  %c  ", mat[k][j+x][i]);
                 }
                 if(k<2)
-                    printf("|\t");
+                    printf("  |  ");
             }
         }
         printf("\n");
         x++;
 
     }
-    for(int y=0;y<27;y++)
-        printf("---");
+    for(int y=0;y<54;y++)
+        printf("-");
     printf("\n");
 
     //printa da 3 á 6 linha
@@ -115,17 +119,17 @@ void mostraTabuleiro(char **mat[]){
                 if(x==3)
                     x=0;
                 for (i = 0; i < 3; i++) {
-                    printf("%c\t", mat[k+3][j+x][i]);
+                    printf("  %c  ", mat[k+3][j+x][i]);
                 }
                 if(k<2)
-                    printf("|\t");
+                    printf("  |  ");
             }
         }
         printf("\n");
         x++;
     }
-    for(int y=0;y<27;y++)
-        printf("---");
+    for(int y=0;y<54;y++)
+        printf("-");
     printf("\n");
 
     //printa da 6 á 9 linha
@@ -135,15 +139,16 @@ void mostraTabuleiro(char **mat[]){
                 if(x==3)
                     x=0;
                 for (i = 0; i < 3; i++) {
-                    printf("%c\t", mat[k+6][j+x][i]);
+                    printf("  %c  ", mat[k+6][j+x][i]);
                 }
                 if(k<2)
-                    printf("|\t");
+                    printf("  |  ");
             }
         }
         printf("\n");
         x++;
     }
+    printf("\n");
 }
 
 //cria os 9 mini-tabuleiros(de forma não dinamica)

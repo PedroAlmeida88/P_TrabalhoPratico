@@ -1,14 +1,14 @@
-//
-// Created by pedro on 11/04/2022.
-//
+// Trabalho Pratico Programacao - LEI
+// DEIS-ISEC 2021-2022
+// José Pedro Sousa Almeida-a2020141980
 
 #ifndef TP_JOGO_H
 #define TP_JOGO_H
 
 //recebe a matriz e o jogador a começar
-void comeca_jogo(char **mat[],int jogador);
+void comeca_jogo(int jogador,int flag_fich);
 //jogo contra o computador
-void comeca_jogo_bot(char **mat[]);
+void comeca_jogo_bot(int flag_fich);
 //converte uma posicao(1-9) para as coordenadas no array
 int converte_posicao(int pos,int *x,int *y);
 //verifica se foi completada uma linha
