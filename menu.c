@@ -9,10 +9,9 @@ int menu(){
     do {
         printf("1-Jogar\n");
         printf("2-Regras\n");
-        printf("3-Ajuda\n");
         res = scanf("%d",&opc);
         fflush(stdin);
-    }while(res == 0 || opc < 1 || opc > 3);
+    }while(res == 0 || opc < 1 || opc > 2);
     return opc;
 }
 
@@ -63,6 +62,44 @@ int menu_continua_jogo(){
         res = scanf("%d",&num);
         fflush(stdin);
     }while(res == 0 || num < 1 || num > 2);
+
+    return num;
+}
+
+int menu_novo_jogo(){
+    int res,num;
+    do{
+        printf("\nDeseja jogar novamente?\n");
+        printf("1-Sim\n");
+        printf("2-Nao\n");
+        res = scanf("%d",&num);
+        fflush(stdin);
+    }while(res == 0 || num < 1 || num > 2);
+
+    return num;
+}
+int menu_regras(){
+    int res,num;
+    printf("\n-------------------------------ULTIMATE TIC-TAC-TOC--------------------------------\n");
+    printf("\n-O jogador inicial e definido aleatoriamente.\n");
+    printf("\n-O jogador inicial escolhe em qual mini-tabuleiro dejesa iniciar o jogo\n");
+    printf("\n-Na sua vez, cada jogador coloca a sua peca num dos 9 mini-tabuleiros.\n");
+    printf("\n-Um jogador que faca 3 em linha num dos mini-tabuleiros ganha essa seccao.\n");
+    printf("\n-Um jogador que ganhe 3 mini-tabuleiros em linha (no tabuleiro grande) ganha o jogo\n");
+    printf("\n-A escolha do mini-tabuleiro em que se joga nao e livre, sendo determinada pela"
+                   "\njogada anterior do adversario. A posicao escolhida pelo adversario identifica o "
+                   "\nmini-tabuleiro onde deve ser continuado o jogo.\n");
+    printf("\n-Verifica-se um empate se o jogo chegar ao final sem que nenhum dos jogadores"
+                   "\nconsiga fazer 3 mini-tabuleiros em linha.\n");
+
+
+    printf("\n-----------------------------------------------------------------------------------\n");
+    do{
+
+        printf("1-Voltar\n");
+        res = scanf("%d",&num);
+        fflush(stdin);
+    }while(res == 0 || num !=1);
 
     return num;
 }

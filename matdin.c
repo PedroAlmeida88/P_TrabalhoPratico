@@ -4,20 +4,35 @@
 #include "stdio.h"
 #include "stdlib.h"
 
+
+void libertaTabuleiro(char ***mat,int tabs,int nLin){
+    for (int i = 0; i < tabs; i++)
+    {
+        for (int j = 0; j < nLin; j++) {
+            free(mat[i][j]);
+        }
+        free(mat[i]);
+    }
+    free(mat);
+}
+
 char*** criaTabuleiro(int tabs,int nLin,int nCol){
     char*** mat = (char***)malloc(tabs * sizeof(char**));
 
     if (mat == NULL)
     {
         printf("Erro ao alocar memoria");
+        libertaTabuleiro(mat,tabs,nLin);
         return NULL;
     }
+
     for (int i = 0; i < tabs; i++)
     {
         mat[i] = (char**)malloc(nLin * sizeof(char*));
         if (mat[i] == NULL)
         {
             printf("Erro ao alocar memoria");
+            libertaTabuleiro(mat,tabs,nLin);
             return NULL;
         }
         for (int j = 0; j < nLin; j++)
@@ -26,6 +41,7 @@ char*** criaTabuleiro(int tabs,int nLin,int nCol){
             if (mat[i][j] == NULL)
             {
                 printf("Erro ao alocar memoria");
+                libertaTabuleiro(mat,tabs,nLin);
                 return NULL;
             }
         }
@@ -41,16 +57,7 @@ char*** criaTabuleiro(int tabs,int nLin,int nCol){
     }
     return mat;
 }
-void libertaTabuleiro(char ***mat,int tabs,int nLin){
-    for (int i = 0; i < tabs; i++)
-    {
-        for (int j = 0; j < nLin; j++) {
-            free(mat[i][j]);
-        }
-        free(mat[i]);
-    }
-    free(mat);
-}
+
 void libertaMat(char** p, int nLin){
 
     int i;

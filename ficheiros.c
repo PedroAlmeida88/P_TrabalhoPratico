@@ -131,7 +131,6 @@ int verifica_existencia_ficheiro(char *filename) {
     return 0;
 }
 
-
 pJogada reconstroi_lista(char *filename,pJogada p){
     int num_jogadas,modo_jogo;
     Jogada a;

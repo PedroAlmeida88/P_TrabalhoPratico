@@ -10,7 +10,7 @@
 #include "listas.h"
 #include "ficheiros.h"
 #include "menu.h"
-#include <errno.h>
+
 //converte uma posicao(1-9) para as coordenadas no array
 int converte_posicao(int pos,int *x,int *y){
     switch (pos) {
@@ -72,9 +72,6 @@ void comeca_jogo(int jogador,int flag_fich) {
         //recontruir lista ligada
         lista = reconstroi_lista("jogo.bin", lista);
     } else if(flag_fich == 2){//caso haja um ficheiro e não seja pretendido continuar o jogo
-        if (remove("jogo.bin") == -1) {
-            printf("Erro a remover o ficheiro");
-        }
         mat = criaTabuleiro(9, 3, 3);
     }else//caso não exista um ficheiro
         mat = criaTabuleiro(9, 3, 3);
@@ -85,7 +82,7 @@ void comeca_jogo(int jogador,int flag_fich) {
 
     if(flag == 0) {
         do {
-            printf("Em qual mini-tabuleiro deseja comecar?(1-9):");
+            printf("Jogador %d, em qual mini-tabuleiro deseja comecar?(1-9):",jogador);
             res = scanf("%d", &mini_tab);
             fflush(stdin);
         } while (mini_tab < 1 || mini_tab > 9 || res == 0);
@@ -184,9 +181,6 @@ void comeca_jogo_bot(int flag_fich) {
         //recontruir lista ligada
         lista = reconstroi_lista("jogo.bin", lista);
     } else if(flag_fich == 2){//caso haja um ficheiro e não seja pretendido continuar o jogo
-        if (remove("jogo.bin") == -1) {
-            printf("Erro a apagar o ficheiro\n");
-        }
         mat = criaTabuleiro(9, 3, 3);
     }else//caso não exista um ficheiro
         mat = criaTabuleiro(9, 3, 3);
