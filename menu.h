@@ -10,6 +10,5 @@ int menu_jogo();
 int escolhe();
 int menu_jogada();
 int menu_continua_jogo();
-int menu_novo_jogo();
 int menu_regras();
 #endif //TP_MENU_H

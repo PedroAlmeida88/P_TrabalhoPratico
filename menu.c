@@ -66,18 +66,6 @@ int menu_continua_jogo(){
     return num;
 }
 
-int menu_novo_jogo(){
-    int res,num;
-    do{
-        printf("\nDeseja jogar novamente?\n");
-        printf("1-Sim\n");
-        printf("2-Nao\n");
-        res = scanf("%d",&num);
-        fflush(stdin);
-    }while(res == 0 || num < 1 || num > 2);
-
-    return num;
-}
 int menu_regras(){
     int res,num;
     printf("\n-------------------------------ULTIMATE TIC-TAC-TOC--------------------------------\n");

@@ -5,7 +5,10 @@
 #ifndef TP_JOGO_H
 #define TP_JOGO_H
 
-//recebe a matriz e o jogador a começar
+//recebe o jogador a começar e a "flag_fich"
+//flag_fich = 0 ->não existe um jogo anterior
+//flag_fich = 1 ->existe um jogo anterior e vai ser retomado
+//flag_fich = 2 ->existe um jogo anterior mas não vai ser retomado
 void comeca_jogo(int jogador,int flag_fich);
 //jogo contra o computador
 void comeca_jogo_bot(int flag_fich);
@@ -21,7 +24,7 @@ int diagonalUm(char **mat[],int min_tab,int lin);
 int diagonalDois(char **mat[],int min_tab,int lin);
 //verifica se houve um empate num mini-tabuleiro
 int empate(char **mat[],int mini_tab,int lin);
-int ganha_mini_tabuleiro(char **mat[],int mini_tab,int lin,int jogador, char **vencedores);
+void ganha_mini_tabuleiro(char **mat[],int mini_tab,int lin,int jogador, char **vencedores);
 //limpa um tabuleiro ganho
 void encerra_mini_tabuleiro(char **mat[],int mini_tab,int jogador, char **vencedores);
 //verifica se foi completada uma linha no quadro final

@@ -57,8 +57,7 @@ int converte_posicao(int pos,int *x,int *y){
 }
 //recebe o jogador a começar e uma flag que indica se existe um jogo anterior
 void comeca_jogo(int jogador,int flag_fich) {
-    int mini_tab, pos = 0, x, y, resul, ganhou, res = 1, n_jogada = 1, n, opt, flag = 0; //n->num de jogadas para ver
-    char aux;
+    int mini_tab, pos = 0, x, y, resul, ganhou, res = 1, n_jogada = 1, n, flag = 0; //n->num de jogadas para ver
     pJogada lista = NULL;//lista ligada que vai guardar as jogadas
     char ***mat, **vencedores;
     vencedores = criaMat(3,3);//armazena o vencedor de cada mini-tab
@@ -71,16 +70,16 @@ void comeca_jogo(int jogador,int flag_fich) {
         jogador = jogador % 2 + 1;
         //recontruir lista ligada
         lista = reconstroi_lista("jogo.bin", lista);
-    } else if(flag_fich == 2){//caso haja um ficheiro e não seja pretendido continuar o jogo
+    } else {//caso não seja pretendido continuar o jogo
         mat = criaTabuleiro(9, 3, 3);
-    }else//caso não exista um ficheiro
-        mat = criaTabuleiro(9, 3, 3);
+    }
+
 
 
     //recebe mat e o jogador a jogar
     mostraTabuleiro(mat);
 
-    if(flag == 0) {
+    if(flag == 0) {//para apenas perguntar qunado é um novo jogo
         do {
             printf("Jogador %d, em qual mini-tabuleiro deseja comecar?(1-9):",jogador);
             res = scanf("%d", &mini_tab);
@@ -123,16 +122,16 @@ void comeca_jogo(int jogador,int flag_fich) {
 
         //guarda a jogada na lista
         lista = insere_final(lista,n_jogada,mini_tab,pos,jogador);
-        //mostra_lista(lista);
-
         //verificar se alguem ganhou um mini-tab
         ganha_mini_tabuleiro(mat,mini_tab,3,jogador,vencedores);
         //atualizar para o novo mini-tabuleiro
         mini_tab = pos;
 
         printf("\n");//para os mini-tabuleiros não desformatarem
+
         mostraTabuleiro(mat);
 
+        //verificar se algum jogador ganhou o jogo
         ganhou = ganha_quadro_final(vencedores,jogador);
         if(ganhou != 1) {
             //troca o jogador
@@ -149,7 +148,7 @@ void comeca_jogo(int jogador,int flag_fich) {
                 } while (vencedores[x][y] != '_' || res == 0 ||resul == 1);//para n voltar para um tab já ganho
             }
             printf("\nJogador %d, esta a jogar no tabuleiro %d\n", jogador, mini_tab);
-            //verificar se algum jogador ganhou o jogo
+
         }
         n_jogada++;
 
@@ -180,17 +179,16 @@ void comeca_jogo_bot(int flag_fich) {
         jogador = jogador % 2 + 1;
         //recontruir lista ligada
         lista = reconstroi_lista("jogo.bin", lista);
-    } else if(flag_fich == 2){//caso haja um ficheiro e não seja pretendido continuar o jogo
+    } else{//caso não seja pretendido continuar o jogo
         mat = criaTabuleiro(9, 3, 3);
-    }else//caso não exista um ficheiro
-        mat = criaTabuleiro(9, 3, 3);
+    }
 
 
 
     //recebe mat e o jogador a jogar
     mostraTabuleiro(mat);
 
-    if (flag == 0) {
+    if (flag == 0) {//para apenas perguntar qunado é um novo jogo
         do {
             printf("Em qual mini-tabuleiro deseja comecar?(1-9):");
             res = scanf("%d", &mini_tab);
@@ -352,7 +350,7 @@ int empate(char **mat[],int mini_tab,int lin){
         }
     return 1;
 }
-int ganha_mini_tabuleiro(char **mat[],int mini_tab,int lin,int jogador, char **vencedores){
+void ganha_mini_tabuleiro(char **mat[],int mini_tab,int lin,int jogador, char **vencedores){
     int Linha = linha(mat,mini_tab,lin);
     int Coluna = coluna(mat,mini_tab,lin);
     int DiagUm = diagonalUm(mat,mini_tab,lin);
