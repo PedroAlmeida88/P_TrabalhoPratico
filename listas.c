@@ -50,8 +50,6 @@ void mostra_n_jogadas_anteriores(pJogada p,int n,int n_jogada){
     }
     else
         printf("Erro no num da jogada\n");
-
-
 }
 
 void liberta_lista(pJogada p){

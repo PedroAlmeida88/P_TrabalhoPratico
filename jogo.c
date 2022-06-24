@@ -74,8 +74,6 @@ void comeca_jogo(int jogador,int flag_fich) {
         mat = criaTabuleiro(9, 3, 3);
     }
 
-
-
     //recebe mat e o jogador a jogar
     mostraTabuleiro(mat);
 
